@@ -45,8 +45,12 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 
-# markdown files
+# markdown files (keep only README.md)
 *.md
+!README.md
 docs/*.md
+
+# local launcher scripts
+start.bat
 
 
