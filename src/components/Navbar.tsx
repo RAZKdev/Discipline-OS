@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Streak } from '@/domain/types';
 import { createClient } from '@/infrastructure/supabase/client';
 import { signOutAction } from '@/app/auth/actions';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface NavbarProps {
   streak?: Streak;
@@ -19,6 +20,7 @@ interface UserProfile {
 
 export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
   const pathname = usePathname();
+  const { lang, toggleLang, t } = useLanguage();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -67,16 +69,16 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
         <div className="flex items-center space-x-1.5 sm:space-x-6 min-w-0">
           <Link
             href="/"
-            aria-label="Discipline-OS Beranda"
+            aria-label={t('nav.homeAria')}
             className="flex items-center space-x-2 text-base sm:text-lg font-bold tracking-tight text-[var(--text-primary)] hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] rounded-md px-1 py-1 shrink-0"
           >
             <span className="w-7 h-7 rounded-md bg-[var(--accent-foundation)] flex items-center justify-center text-white text-xs font-black shrink-0">
               D
             </span>
-            <span className="hidden sm:inline">Discipline-OS</span>
+            <span className="hidden sm:inline">{t('nav.brand')}</span>
           </Link>
 
-          <nav aria-label="Navigasi Utama" className="flex items-center space-x-0.5 sm:space-x-1 overflow-x-auto no-scrollbar py-1">
+          <nav aria-label={t('nav.mainNavAria')} className="flex items-center space-x-0.5 sm:space-x-1 overflow-x-auto no-scrollbar py-1">
             <Link
               href="/"
               className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors shrink-0 ${
@@ -85,7 +87,7 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]'
               }`}
             >
-              Tentang
+              {t('nav.about')}
             </Link>
             <Link
               href="/today"
@@ -95,7 +97,7 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]'
               }`}
             >
-              Hari Ini
+              {t('nav.today')}
             </Link>
             <Link
               href="/rewards"
@@ -105,7 +107,7 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]'
               }`}
             >
-              Hadiah
+              {t('nav.rewards')}
             </Link>
             <Link
               href="/settings"
@@ -115,12 +117,12 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)]'
               }`}
             >
-              Pengaturan
+              {t('nav.settings')}
             </Link>
           </nav>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           {streak && (
             <div className="hidden sm:flex items-center space-x-2">
               <div
@@ -131,16 +133,16 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
                 }`}
                 title={
                   streak.isPaused
-                    ? 'Streak sedang dijeda dengan bijak (tidak ada penalti)'
-                    : `Konsistensi ${streak.currentStreak} hari aktif`
+                    ? t('nav.streakPausedTitle')
+                    : t('nav.streakActiveTitle', { count: streak.currentStreak })
                 }
               >
                 <span aria-hidden="true">{streak.isPaused ? '⏸️' : '🌿'}</span>
                 <span>
                   {streak.isPaused ? (
-                    <span>Dijeda ({streak.currentStreak} hari)</span>
+                    <span>{t('nav.streakPaused', { count: streak.currentStreak })}</span>
                   ) : (
-                    <span>{streak.currentStreak} Hari Beruntun</span>
+                    <span>{t('nav.streakActive', { count: streak.currentStreak })}</span>
                   )}
                 </span>
               </div>
@@ -149,22 +151,30 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
                 <button
                   type="button"
                   onClick={onToggleStreakPause}
-                  aria-label={
-                    streak.isPaused
-                      ? 'Lanjutkan pelacakan streak'
-                      : 'Jeda pelacakan streak tanpa rasa bersalah'
-                  }
+                  aria-label={streak.isPaused ? t('nav.resumeAria') : t('nav.pauseAria')}
                   className="text-xs px-2.5 py-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] border border-[var(--border)] rounded-md transition-colors min-h-[36px]"
                 >
-                  {streak.isPaused ? 'Aktifkan' : 'Jeda'}
+                  {streak.isPaused ? t('nav.resumeBtn') : t('nav.pauseBtn')}
                 </button>
               )}
             </div>
           )}
 
+          {/* Language Switcher */}
+          <button
+            type="button"
+            onClick={toggleLang}
+            aria-label={t('nav.langToggleAria')}
+            data-testid="lang-toggle-btn"
+            className="text-xs px-2.5 py-1.5 min-h-[36px] flex items-center space-x-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] border border-[var(--border)] rounded-md transition-colors font-semibold"
+          >
+            <span aria-hidden="true">🌐</span>
+            <span className="font-bold">{t('nav.langBadge')}</span>
+          </button>
+
           {/* User Profile / Auth State */}
           {user ? (
-            <div className="flex items-center space-x-2 border-l border-[var(--border)] pl-3">
+            <div className="flex items-center space-x-2 border-l border-[var(--border)] pl-2 sm:pl-3">
               <div
                 className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800 flex items-center justify-center text-xs font-bold"
                 title={user.email}
@@ -179,24 +189,24 @@ export function Navbar({ streak, onToggleStreakPause }: NavbarProps) {
                 onClick={handleSignOut}
                 disabled={isSigningOut}
                 className="text-xs px-2.5 py-1.5 min-h-[36px] text-[var(--text-secondary)] hover:text-red-600 hover:bg-[var(--surface-subtle)] border border-[var(--border)] rounded-md transition-colors"
-                aria-label="Keluar dari akun"
+                aria-label={t('nav.logoutAria')}
               >
-                {isSigningOut ? '...' : 'Keluar'}
+                {isSigningOut ? '...' : t('nav.logout')}
               </button>
             </div>
           ) : (
-            <div className="flex items-center space-x-2 border-l border-[var(--border)] pl-3">
+            <div className="flex items-center space-x-2 border-l border-[var(--border)] pl-2 sm:pl-3">
               <Link
                 href="/auth/login"
                 className="text-xs font-medium px-3 py-1.5 min-h-[36px] flex items-center rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] border border-[var(--border)] transition-colors"
               >
-                Masuk
+                {t('nav.login')}
               </Link>
               <Link
                 href="/auth/register"
                 className="hidden sm:inline-flex text-xs font-semibold px-3 py-1.5 min-h-[36px] items-center rounded-md bg-emerald-700 hover:bg-emerald-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors shadow-xs"
               >
-                Daftar
+                {t('nav.register')}
               </Link>
             </div>
           )}

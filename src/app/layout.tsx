@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { PWARegistration } from '@/components/PWARegistration';
+import { LanguageProvider } from '@/i18n/LanguageContext';
 
 export const metadata: Metadata = {
   title: 'Discipline-OS — Sistem Konsistensi Harian yang Tenang & Terstruktur',
@@ -27,8 +28,10 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] antialiased">
-        <PWARegistration />
-        {children}
+        <LanguageProvider>
+          <PWARegistration />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
